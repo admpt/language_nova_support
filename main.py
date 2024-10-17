@@ -48,10 +48,13 @@ async def process_question(message: types.Message, state: FSMContext):
             question_id = cursor.lastrowid  # Получаем ID последней вставленной строки
 
     # Отправляем вопрос администратору в нужном формате
-    await bot.send_message(ADMIN_ID,
-                           f"Сообщение от пользователя {message.from_user.full_name} (ID: {question_id}):\n{question}\n\nОтветьте на это сообщение, чтобы ответить пользователю.")
+    await bot.send_message(
+        ADMIN_ID,
+        f"Сообщение от пользователя <a href='tg://user?id={user_id}'>{message.from_user.full_name}</a> (ID: {question_id}):\n{question}",
+        parse_mode='HTML'
+    )
 
-    await message.answer("Ваш вопрос обрабатывается!")
+    await message.answer("<b>Ваш вопрос в процессе обработки.</b>\n• Пожалуйста, ожидайте ответ в течение 24 часов.\n• Если по истечении этого времени ответа не будет, попробуйте ещё раз", parse_mode='HTML')
 
 
 @router.message(lambda message: message.from_user.id == ADMIN_ID)
@@ -98,12 +101,13 @@ async def forward_user_message(message: types.Message):
             await db.commit()
             question_id = cursor.lastrowid  # Получаем ID последней вставленной строки
 
-    await bot.send_message(ADMIN_ID,
-                           f"Сообщение от пользователя {message.from_user.full_name} (ID: {question_id}):\n{user_message}\n\nОтветьте на это сообщение, чтобы ответить пользователю.")
-
+    await bot.send_message(
+        ADMIN_ID,
+        f"Сообщение от пользователя <a href='tg://user?id={user_id}'>{message.from_user.full_name}</a> (ID: {question_id}):\n{user_message}",
+        parse_mode='HTML'
+    )
     # Уведомляем пользователя о том, что его сообщение обрабатывается
-    await message.answer("Ваш вопрос обрабатывается!")
-
+    await message.answer("<b>Ваш вопрос в процессе обработки.</b>\n• Пожалуйста, ожидайте ответ в течение 24 часов.\n• Если по истечении этого времени ответа не будет, попробуйте ещё раз", parse_mode='HTML')
 
 # Создаем или открываем базу данных
 async def db_setup():
